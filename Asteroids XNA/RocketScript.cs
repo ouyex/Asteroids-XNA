@@ -19,18 +19,17 @@ namespace Asteroids_XNA
 
         // Speeds
         float forwardSpeed = 0.25f;
-        float rotationSpeed = 0.5f;
+        float rotationSpeed = 0.35f;
         float forwardFriction = 1.01f;
         float rotationFriction = 1.05f;
+        float brakingFriction = 1.05f;
 
         // Textures
         Texture2D bulletTexture;
-        SpriteFont pixelFont;
 
         public override void Start()
         {
             bulletTexture = SceneManager.LoadTexture("bullet");
-            pixelFont = SceneManager.LoadFont("PixelFont");
             attachedEntity._loopOverScreenEdge = true;
             attachedEntity._loopOverScreenEdgeMargin = 20;
             attachedEntity._collisionRectanglePadding = new Vector2(-5);
@@ -41,7 +40,8 @@ namespace Asteroids_XNA
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!hasStarted)
-                spriteBatch.DrawString(pixelFont, $"{timerInt}", new Vector2(SceneManager.screenWidth / 2 - 10, SceneManager.screenHeight / 2 - 100), Color.White);
+                spriteBatch.DrawString(SceneManager.pixelFont, $"{timerInt}", new Vector2(SceneManager.screenWidth / 2 - 10, SceneManager.screenHeight / 2 - 100), Color.White);
+            
         }
 
         public override void Update()
@@ -63,7 +63,7 @@ namespace Asteroids_XNA
 
             // Input
             int rotInput = (InputHelper.GetKey(Keys.D) ? 1 : 0) - (InputHelper.GetKey(Keys.A) ? 1 : 0);
-            int forwardInput = (InputHelper.GetKey(Keys.W) ? 1 : 0) - (InputHelper.GetKey(Keys.S) ? 1 : 0);
+            int forwardInput = (InputHelper.GetKey(Keys.W) ? 1 : 0);
 
             // Update velocities
             Vector2 forwardDirection = new Vector2((float)Math.Cos(attachedEntity._angle),
@@ -74,6 +74,13 @@ namespace Asteroids_XNA
             // Friciton
             rotationVelocity /= rotationFriction;
             forwardVelocity /= forwardFriction;
+
+            if (InputHelper.GetKey(Keys.S))
+            {
+                forwardVelocity /= brakingFriction;
+                rotationVelocity /= brakingFriction;
+            }
+            
 
             // Apply
             attachedEntity._position += forwardVelocity;
@@ -98,7 +105,15 @@ namespace Asteroids_XNA
             if (hitAsteroids.Count > 0 && !SceneManager.debugMode)
             {
                 SceneManager.DestroyEntity(attachedEntity._id);
-                SceneManager.DestroyEntity(hitAsteroids.Values.ToList()[0]._id);
+
+                Entity asteroid = hitAsteroids.Values.ToList()[0];
+                AsteroidScript asteroidScript = null;
+                foreach (Script s in asteroid.attachedScripts)
+                    if (s.GetType().ToString() == "Asteroids_XNA.AsteroidScript")
+                        asteroidScript = s as AsteroidScript;
+
+                asteroidScript.Destroy();
+                SceneManager.isDead = true;
             }
         }
     }

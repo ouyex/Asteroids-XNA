@@ -39,6 +39,7 @@ namespace Asteroids_XNA
                         hitAsteroidScript = s as AsteroidScript;
                 if (hitAsteroidScript != null)
                     hitAsteroidScript.Destroy();
+                SceneManager.score++;
             }
         }
     }

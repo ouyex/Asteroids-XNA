@@ -15,13 +15,14 @@ namespace Asteroids_XNA
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            SceneManager.content = Content;
-            SceneManager.graphics = _graphics;
         }
 
         protected override void Initialize()
         {
             base.Initialize();
+            SceneManager.content = Content;
+            SceneManager.graphics = _graphics;
+            SceneManager.graphicsDevice = GraphicsDevice;
         }
 
         protected override void LoadContent()

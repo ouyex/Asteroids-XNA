@@ -12,6 +12,7 @@ namespace Asteroids_XNA
     {
         public static ContentManager content;
         public static GraphicsDeviceManager graphics;
+        public static GraphicsDevice graphicsDevice;
 
         public static Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
         static int entityIdCounter = 0;
@@ -19,13 +20,19 @@ namespace Asteroids_XNA
         public static int screenWidth = 1600;
         public static int screenHeight = 900;
 
-        public static bool debugMode = true;
+        public static bool debugMode = false;
 
         public static Texture2D pixel;
         public static Texture2D asteroid1Texture;
+        public static SpriteFont pixelFont;
+
+        public static int score;
+        public static bool isDead = false;
 
         public static void ApplyScreenModifications()
         {
+            //screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            //screenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             graphics.PreferredBackBufferWidth = screenWidth;
             graphics.PreferredBackBufferHeight = screenHeight;
             graphics.ApplyChanges();
@@ -33,8 +40,11 @@ namespace Asteroids_XNA
 
         public static void LoadScene(Scene scene)
         {
+            score = 0;
+            isDead = false;
             pixel = LoadTexture("pixel");
-            asteroid1Texture = SceneManager.LoadTexture("asteroid1");
+            asteroid1Texture = LoadTexture("asteroid1");
+            pixelFont = LoadFont("PixelFont");
             loadedEntities.Clear();
             entityIdCounter = 0;
             scene.Load();
@@ -60,12 +70,12 @@ namespace Asteroids_XNA
             try
             {
                 SpriteFont f = content.Load<SpriteFont>(fontName);
-                Logger.LogInfo($"Loaded texture \"{fontName}\".");
+                Logger.LogInfo($"Loaded font \"{fontName}\".");
                 return f;
             }
             catch (Exception e)
             {
-                Logger.LogError($"Failed to load texture \"{fontName}\".", e.ToString());
+                Logger.LogError($"Failed to load font \"{fontName}\".", e.ToString());
                 return null;
             }
         }
@@ -111,6 +121,7 @@ namespace Asteroids_XNA
 
             foreach(Entity e in entitiesToUpdate)
                 e.Update();
+
         }
 
         public static void Draw(SpriteBatch spriteBatch)
@@ -123,7 +134,11 @@ namespace Asteroids_XNA
                 foreach (Script s in e.attachedScripts)
                     s.Draw(spriteBatch);
             }
-            
+
+            spriteBatch.DrawString(pixelFont, $"Score: {score}", new Vector2(20, 20), Color.White);
+
+            if (isDead)
+                spriteBatch.DrawString(SceneManager.pixelFont, $"You Are Dead!\nPress R to Restart", new Vector2(SceneManager.screenWidth / 2 - 150, SceneManager.screenHeight / 2 - 20), Color.White);
         }
     }
 }

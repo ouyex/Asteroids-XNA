@@ -18,10 +18,10 @@ namespace Asteroids_XNA
             rocket.AttachScript(new RocketScript());
 
             Random rand = new Random();
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Entity asteroid = SceneManager.SpawnEntity(new Entity(SceneManager.asteroid1Texture, new Vector2(rand.Next(SceneManager.screenWidth, SceneManager.screenWidth + 1000), rand.Next(SceneManager.screenHeight, SceneManager.screenHeight + 1000))));
-                asteroid._scale = new Vector2((float)rand.NextDouble() * 2f + 2);
+                asteroid._scale = new Vector2((float)rand.NextDouble() * 3.25f + 2);
                 asteroid._angle = rand.Next(360);
                 asteroid._tag = "asteroid";
                 asteroid.AttachScript(new AsteroidScript());
